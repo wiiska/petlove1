@@ -1,3 +1,7 @@
+@extends('base')
+@section('conteudo')
+@section('titulo', 'Página Inícial')
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -113,13 +117,14 @@
                             <div class="card-body">
                                 <h2>Produtos</h2>
                                 <p>Encontre os melhores produtos para seu pet, incluindo brinquedos, alimentos e acessórios de qualidade.</p>
+                                <a href="{{url("produtos")}}" class="btn btn-outline-secondary">Produtos</a><br>
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Cart Button -->
-                <a href="carrinho.html" class="cart-button">
+                <a href="{{url("carrinho")}}" class="cart-button">
                     🛒
                 </a>
             </div>
