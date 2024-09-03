@@ -21,17 +21,22 @@
                 <th scope="col">Nome</th>
                 <th scope="col">Valor</th>
                 <th scope="col">Quantidade</th>
-                <th scope="col">Departamento</th>
+                <th scope="col">Imagem</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($produtos as $produto)
+            @php
+                $imagem = !empty($produto->imagem) ? $produto->imagem : 'C:\laragon\www\petlove1\storage\app\public\sem_imagem.jpg';
+                $srcImagem = public_path()."C:\laragon\www\petlove1\storage\app\public\imagem".$imagem;
+            @endphp
                 <tr>
                     <th scope="row">{{ $produto->id }}</th>
                     <td>{{ $produto->nome }}</td>
                     <td>{{ $produto->valor }}</td>
                     <td>{{ $produto->qtd }}</td>
-                    <td>{{ $produto->departamento->descricao ?? '' }}</td>
+                    <td><img src="{{ $imagem }}" alt="img" style="width: 100px"></td>
+                    <td></td>
                 </tr>
             @empty
                 <tr>
