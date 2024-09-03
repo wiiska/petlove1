@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->char('nome');
             $table->float('valor');
+            $table->string('imagem')->nullable();
             $table->float('qtd');
         });
     }

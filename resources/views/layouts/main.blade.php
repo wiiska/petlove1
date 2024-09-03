@@ -22,7 +22,6 @@
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,73 +30,64 @@
         rel="stylesheet">
 
     <style>
-        h1,
-        h2,
-        h3,
-        h4,
-        a {
+        h1, h2, h3, h4, a {
             font-family: "Comfortaa", sans-serif;
             font-optical-sizing: auto;
             font-weight: 400;
             font-style: normal;
         }
     </style>
-
 </head>
 
-<body>
+<body style="background-color: #F8F9FA;">
 
-    <nav class="navbar navbar-expand-lg bg-light" style="background-color: #FFFFFF;">
+    <nav class="navbar navbar-expand-lg" style="background-color: #4B0082;">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <div class="container">
-                    <img src="/img/slogan.png" alt="Bootstrap" width="100" height="50">
-                </div>
+                <img src="/img/slogan.png" alt="Logo" width="100" height="50">
             </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active text-primary-emphasis" aria-current="page" href="/plano"><i
-                                class="fa-solid fa-wifi"></i>Pedidos</a>
+                        <a class="nav-link text-white" aria-current="page" href="/plano"><i
+                                class="fa-solid fa-wifi"></i> Pedidos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active text-primary-emphasis" aria-current="page" href="/produto"><i
+                        <a class="nav-link text-white" aria-current="page" href="/produto"><i
                                 class="fa-solid fa-box-open"></i> Produtos</a>
+                    </li>
                     <li class="nav-item">
-                        <a class="nav-link active text-primary-emphasis" aria-current="page" href="/promocao"><i
-                                class="fa-solid fa-hand-holding-dollar"></i>Carrinho de Compras</a>
+                        <a class="nav-link text-white" aria-current="page" href="/promocao"><i
+                                class="fa-solid fa-hand-holding-dollar"></i> Carrinho de Compras</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <style>
-        body {
-            background-color: #212529;
-        }
-    </style>
-
     <div class="container mt-4">
         <div class="row">
             <div>
                 @if ($errors->any())
-                    <b>Por favor, verifique os erros abaixo:</b>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li> {{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="alert alert-danger">
+                        <b>Por favor, verifique os erros abaixo:</b>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li> {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
             </div>
             @yield('content')
         </div>
     </div>
-    <footer class="align-bottom">
-        <p class="text-center text-white">PetLove Ltda &copy; 2024</p>
+
+    <footer class="text-center mt-5">
+        <p class="text-muted">PetLove Ltda &copy; 2024</p>
     </footer>
 
-    <!-- Bootstrap javascript-->
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>

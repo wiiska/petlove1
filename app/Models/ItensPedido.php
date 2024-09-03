@@ -13,8 +13,9 @@ class ItensPedido extends Model
 
     public function product()
     {
-        return $this->belongsTo(Produtos::class);
+        return $this->belongsTo(Produtos::class, 'produto_id');
     }
+    
 
     public function user()
     {

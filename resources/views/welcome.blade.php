@@ -1,7 +1,3 @@
-@extends('base')
-@section('conteudo')
-@section('titulo', 'Página Inícial')
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -102,7 +98,7 @@
                     <nav class="navbar navbar-expand-lg navbar-dark">
                         <ul class="navbar-nav">
                             <li class="nav-item">
-                                <a class="nav-link" href="sobre.html">Entrar/Cadastrar</a>
+                        
                             </li>
                         </ul>
                     </nav>

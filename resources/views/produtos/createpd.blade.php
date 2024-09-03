@@ -3,67 +3,77 @@
 @section('title', 'FastNet')
 
 @section('content')
-
     @php
-        if (!empty($dado->id)) {
-            $route = route('produto.update', $dado->id);
-        } else {
-            $route = route('produto.store');
-        }
+        $route = !empty($dado->id) ? route('produtos.update', $dado->id) : route('produtos.store');
     @endphp
 
-    <div class="container">
-        <div class="row row-gap-3 justify-content-center">
-            <h3 class="col-12 p-3 text-center">
-                <span class="p-2 bg-opacity-80 border border-success rounded-start bg-success-subtle rounded-end">
-                    Formulário de produto
-                </span>
-            </h3>
-            <form action="{{ $route }}" method="post">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card" style="background-color: #4B0082; color: #FFFFFF;">
+                    <div class="card-header text-center">
+                        <h3>Formulário de Produto</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ $route }}" method="post" enctype="multipart/form-data">
+                            @csrf
 
-                @csrf
+                            @if (!empty($dado->id))
+                                @method('put')
+                            @endif
 
-                @if (!empty($dado->id))
-                    @method('put')
-                @endif
+                            <input type="hidden" name="id" value="{{ $dado->id ?? '' }}">
 
-                <input type="hidden" name="id"
-                    value="@if (!empty($dado->id)) {{ $dado->id }}@else{{ '' }} @endif"><br>
+                            <div class="form-group mb-3">
+                                <label><b>Descrição do Produto:</b></label>
+                                <input type="text" name="nome" class="form-control"
+                                    value="{{ old('nome', $dado->nome ?? '') }}">
+                            </div>
 
-                <div class="form-group col-md-6 offset-md-3">
-                    <label class="text-white"><b>Descrição do Produto:</b></label><br>
-                    <input type="text" name="nome" class="form-control"
-                        value="@if (!empty($dado->nome)) {{ $dado->nome }}@elseif (!empty(old('nome'))){{ old('nome') }}@else{{ '' }} @endif"><br>
+                            <div class="form-group mb-3">
+                                <label><b>Valor do Produto (R$):</b></label>
+                                <input type="text" name="valor" class="form-control"
+                                    value="{{ old('valor', $dado->valor ?? '') }}">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label><b>Quantidade:</b></label>
+                                <input type="text" name="qtd" class="form-control"
+                                    value="{{ old('qtd', $dado->qtd ?? '') }}">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label><b>Imagem do Produto:</b></label>
+                                <input type="file" name="imagem" class="form-control" id="imagem-input">
+                                @if (!empty($dado->imagem))
+                                    <div class="mt-3">
+                                        <img src="{{ asset('storage/imagens/' . $dado->imagem) }}" alt="Imagem do Produto" class="img-fluid" style="max-height: 200px;">
+                                    </div>
+                                @else
+                                    <img id="imagem-preview" src="#" alt="Pré-visualização da Imagem" class="img-fluid mt-3" style="display: none; max-height: 200px;">
+                                @endif
+                            </div>
+
+                            <div class="form-group text-end">
+                                <button type="submit" class="btn" style="background-color: #90EE90; color: #4B0082;">Salvar</button>
+                                <a href="{{ route('produtos.index') }}" class="btn btn-primary">Voltar</a>
+                            </div>
+                            
+                        </form>
+                    </div>
                 </div>
-
-                <div class="form-group col-md-6 offset-md-3">
-                    <label class="text-white"><b>Departamento do Produto:</b></label><br>
-                    <select name="departamento_id" class="form-select">
-                        @foreach ($departamentos as $item)
-                            <option value="{{ $item->id }}">{{ $item->descricao }}</option>
-                        @endforeach
-                    </select><br>
-                </div>
-
-                <div class="form-group col-md-6 offset-md-3">
-                    <label class="text-white"><b>Valor do produto (R$):</b></label><br>
-                    <input type="text" name="valor" class="form-control"
-                        value="@if (!empty($dado->valor)) {{ $dado->valor }}@elseif (!empty(old('valor'))){{ old('valor') }}@else{{ '' }} @endif"><br>
-                </div>
-
-                <div class="form-group col-md-6 offset-md-3">
-                    <label class="text-white"><b>Quantidade:</b></label><br>
-                    <input type="text" name="qtd" class="form-control"
-                        value="@if (!empty($dado->qtd)) {{ $dado->qtd }}@elseif (!empty(old('qtd'))){{ old('qtd') }}@else{{ '' }} @endif"><br>
-                </div>
-
- 
-                <br>
-                <div class="form-group col-md-4 offset-md-8">
-                    <button type="submit" class="btn btn-success">Salvar</button>
-                    <a href="{{ url('produto') }}" class="btn btn-primary">Voltar</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('imagem-input').onchange = function (evt) {
+            const [file] = evt.target.files;
+            if (file) {
+                const preview = document.getElementById('imagem-preview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        }
+    </script>
 @stop

@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id'); // Adiciona coluna para ID do usuário
+            $table->string('status')->default('Pendente'); // Status do pedido
+            $table->decimal('total', 10, 2)->default(0); // Valor total do pedido
             $table->timestamps();
+
+            // Define a chave estrangeira para o usuário
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -22,6 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('pedidos', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+        });
+
         Schema::dropIfExists('pedidos');
     }
 };

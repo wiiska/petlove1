@@ -1,130 +1,86 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 use App\Models\Produtos;
+use App\Models\ItensPedido;
+use App\Models\Pedidos; // Corrigido o namespace
+use Illuminate\Support\Facades\Auth;
 use PDF;
+use Illuminate\Support\Facades\Storage;
 
 class ProdutosController extends Controller
 {
     private $pagination = 5;
+
     public function index()
     {
-        //app/http/Controller
         $dado = Produtos::paginate($this->pagination);
-
-        //dd($dado);
-
         return view("produtos.produto_list", ["dado" => $dado]);
     }
 
-    /**
-     * Show the produto_list for creating a new resource.
-     */
     public function create()
     {
-        $departamentos =  Departamento::all();
-        return view("produtos.createpd", ['departamentos' => $departamentos]);
+        return view("produtos.createpd");
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'nome' => "required|max:60",
-            'departamento_id' => "required",
-            'valor' => "required",
-            'qtd' => "required"
-        ], [
-            'nome.required' => "O :attribute é obrigatório",
-            'nome.max' => "Só é permitido 60 caracteres",
-            'departamento_id.required' => "O :attribute é obrigatório",
-            'valor.required' => "O :attribute é obrigatório",
-            'qtd.required' => "O :attribute é obrigatório",
-
+            'nome' => 'required|max:60',
+            'valor' => 'required',
+            'qtd' => 'required',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
+    
         $data = $request->all();
-        /*
-        $produto = new Produto;
-
-        $produto->nome = $request->nome;
-        $produto->categoria_id = $request->categoria_id;
-        $produto->valor = $request->valor;
-        $produto->qtd = $request->qtd;
-
-        $produto->save();
-        */
+    
+        if ($request->hasFile('imagem')) {
+            $imagePath = $request->file('imagem')->store('public/imagens');
+            $data['imagem'] = basename($imagePath);
+        }
+    
         Produtos::create($data);
-
-        return redirect('produto');
+    
+        return redirect()->route('produtos.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the produto_list for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $dado = Produtos::findOrFail($id);
-
-        $departamentos = Departamento::all();
-
-        return view("produtos.createpd", [
-            'dado' => $dado,
-            'departamentos' => $departamentos
-        ]);
+        return view("produtos.createpd", ['dado' => $dado]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //app/http/Controller
-
         $request->validate([
-            'nome' => "required|max:60",
-            'departamento_id' => "required",
-            'valor' => "required|max:16",
-            'qtd' => "required"
-        ], [
-            'nome.required' => "O :attribute é obrigatório",
-            'nome.max' => "Só é permitido 60 caracteres",
-            'departamento_id.required' => "O :attribute é obrigatório",
-            'valor.required' => "O :attribute é obrigatório",
-            'valor.max' => "Só é permitido 16 caracteres",
-            'qtd.required' => "O :attribute é obrigatório",
-
+            'nome' => 'required|max:60',
+            'valor' => 'required|max:16',
+            'qtd' => 'required',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
+    
         $data = $request->all();
-
-        Produtos::updateOrCreate(
-            ['id' => $request->id],
-            $data
-        );
-
-        return redirect('produto');
+        $produto = Produtos::findOrFail($id);
+    
+        if ($request->hasFile('imagem')) {
+            // Delete old image if exists
+            if ($produto->imagem) {
+                Storage::delete('public/imagens/' . $produto->imagem);
+            }
+            $imagePath = $request->file('imagem')->store('public/imagens');
+            $data['imagem'] = basename($imagePath);
+        }
+    
+        $produto->update($data);
+    
+        return redirect()->route('produtos.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $dado = Produtos::findOrFail($id);
-        // dd($dado);
         $dado->delete();
 
         return redirect('produto');
@@ -138,10 +94,9 @@ class ProdutosController extends Controller
                 "like",
                 "%" . $request->nome . "%"
             )->get();
-        }  else {
+        } else {
             $dados = Produtos::all();
         }
-        // dd($dados);
 
         return view("produtos.produto_list", ["dado" => $dados]);
     }
@@ -152,11 +107,39 @@ class ProdutosController extends Controller
 
         $data = [
             'titulo' => 'Relatório de Produtos',
-            'produtos'=> $produtos,
+            'produtos' => $produtos,
         ];
 
         $pdf = PDF::loadView('produtos.report', $data);
 
         return $pdf->stream();
     }
+
+    public function addToCart($id)
+{
+    $produto = Produtos::findOrFail($id);
+
+    // Verifique se o pedido atual está na sessão
+
+    // Verifique se o item já está no carrinho
+    $itemPedido = ItensPedido::where('produto_id', $id)
+        ->where('pedido_id', $pedidoId)
+        ->first();
+
+    if ($itemPedido) {
+        // Se o produto já estiver no carrinho, aumente a quantidade
+        $itemPedido->qtd += 1;
+    } else {
+        // Se não, adicione um novo item ao carrinho
+        $itemPedido = new ItensPedido();
+        $itemPedido->produto_id = $produto->id;
+        $itemPedido->pedido_id = $pedidoId;
+        $itemPedido->qtd = 1;
+    }
+
+    $itemPedido->save();
+
+    // Redireciona para a página do carrinho
+    return redirect()->route('carrinho.index')->with('success', 'Produto adicionado ao carrinho!');
+}
 }
