@@ -11,32 +11,28 @@ use Illuminate\Support\Facades\Auth;
 class PedidosController extends Controller
 {
     public function store(Request $request)
-    {
-        $pedidoId = session('pedido_id');
-        
-        if (!$pedidoId) {
-            return redirect()->route('produtos.index')->with('error', 'Nenhum pedido ativo encontrado.');
-        }
+{
+    $user = auth()->user();
+    $itensPedido = ItensPedido::where('user_id', $user->id)->whereNull('pedido_id')->firstOrFail();
 
-        // Calcula o total do pedido
-        $total = ItensPedido::where('pedido_id', $pedidoId)
-            ->sum(function($item) {
-                return $item->qtd * Produtos::find($item->produto_id)->valor;
-            });
+    $pedido = new Pedidos();
+    $pedido->user_id = $user->id;
+    $pedido->valor_total = $itensPedido->produtos->sum(fn($produto) => $produto->pivot->qtd * $produto->preco);
+    $pedido->save();
 
-        // Cria um novo pedido com os itens do carrinho
-        $pedido = Pedidos::create([
-            'user_id' => Auth::id(),
-            'status' => 'Confirmado',
-            'total' => $total,
+    // Associa os produtos ao pedido
+    foreach ($itensPedido->produtos as $produto) {
+        $pedido->produtos()->attach($produto->id, [
+            'qtd' => $produto->pivot->qtd,
+            'preco_unitario' => $produto->preco,
         ]);
-
-        // Atualiza os itens do carrinho com o novo ID de pedido
-        ItensPedido::where('pedido_id', $pedidoId)->update(['pedido_id' => $pedido->id]);
-
-        // Limpa a sessão
-        session()->forget('pedido_id');
-
-        return redirect()->route('produtos.index')->with('success', 'Pedido finalizado com sucesso!');
     }
+
+    // Atualiza o carrinho para vincular ao pedido
+    $itensPedido->pedido_id = $pedido->id;
+    $itensPedido->save();
+
+    return redirect()->route('pedidos.show', $pedido)->with('success', 'Pedido criado com sucesso!');
+}
+
 }

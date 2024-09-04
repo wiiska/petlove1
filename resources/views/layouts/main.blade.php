@@ -4,9 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>@yield('title')</title>
-
     <link rel="shortcut icon" href="/img/icone.png" type="image/x-icon">
 
     <!-- Fonts -->
@@ -49,16 +47,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link text-white" aria-current="page" href="/plano"><i
-                                class="fa-solid fa-wifi"></i> Pedidos</a>
+                        <a class="nav-link text-white" href=""><i class="fa-solid fa-wifi"></i> Pedidos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" aria-current="page" href="/produto"><i
-                                class="fa-solid fa-box-open"></i> Produtos</a>
+                        <a class="nav-link text-white" href="{{ route('produtos.index') }}"><i class="fa-solid fa-box-open"></i> Produtos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" aria-current="page" href="/promocao"><i
-                                class="fa-solid fa-hand-holding-dollar"></i> Carrinho de Compras</a>
+                        <a class="nav-link text-white" href="{{ route('carrinho.index') }}"><i class="fa-solid fa-hand-holding-dollar"></i> Carrinho de Compras</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ route('pets.index') }}"><i class="fa-solid fa-paw"></i> Pets</a>
                     </li>
                 </ul>
             </div>
@@ -73,7 +71,7 @@
                         <b>Por favor, verifique os erros abaixo:</b>
                         <ul>
                             @foreach ($errors->all() as $error)
-                                <li> {{ $error }}</li>
+                                <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
@@ -95,3 +93,4 @@
 </body>
 
 </html>
+

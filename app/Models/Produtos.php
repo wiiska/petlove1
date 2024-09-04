@@ -14,7 +14,11 @@ class Produtos extends Model
         'nome',
         'valor',
         'qtd',
-        'departamento_id',
         'imagem', // Se você estiver salvando o nome da imagem no banco
     ];
+
+    public function itensPedidos()
+{
+    return $this->belongsToMany(ItensPedido::class)->withPivot('qtd');
+}
 }

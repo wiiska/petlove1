@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
 use App\Models\ItensPedido;
-use App\Models\Pedidos; // Corrigido o namespace
-use Illuminate\Support\Facades\Auth;
 use PDF;
 use Illuminate\Support\Facades\Storage;
 
@@ -79,12 +77,24 @@ class ProdutosController extends Controller
     }
 
     public function destroy($id)
-    {
-        $dado = Produtos::findOrFail($id);
-        $dado->delete();
+{
+    $produto = Produtos::findOrFail($id);
 
-        return redirect('produto');
+    if ($produto->imagem) {
+
+        $produto = Produtos::findOrFail($id);
+        // dd($dado);
+        $image_path = public_path('storage/imagens/'.$produto->imagem);
+
+        if(file_exists($image_path)){
+            unlink($image_path);
+        }
+
     }
+    $produto->delete();
+
+    return redirect()->route('produtos.index')->with('success', 'Produto excluído com sucesso!');
+}
 
     public function search(Request $request)
     {
@@ -115,31 +125,36 @@ class ProdutosController extends Controller
         return $pdf->stream();
     }
 
-    public function addToCart($id)
-{
-    $produto = Produtos::findOrFail($id);
-
-    // Verifique se o pedido atual está na sessão
-
-    // Verifique se o item já está no carrinho
-    $itemPedido = ItensPedido::where('produto_id', $id)
-        ->where('pedido_id', $pedidoId)
-        ->first();
-
-    if ($itemPedido) {
-        // Se o produto já estiver no carrinho, aumente a quantidade
-        $itemPedido->qtd += 1;
-    } else {
-        // Se não, adicione um novo item ao carrinho
-        $itemPedido = new ItensPedido();
-        $itemPedido->produto_id = $produto->id;
-        $itemPedido->pedido_id = $pedidoId;
-        $itemPedido->qtd = 1;
+    public function addToCart(Request $request, $produtoId)
+    {
+        $user = auth()->user();
+        
+        // Verifica se existe um carrinho ativo para o usuário
+        $itensPedido = ItensPedido::where('user_id', $user->id)->first();
+    
+        // Cria o carrinho caso não exista
+        if (!$itensPedido) {
+            $itensPedido = new ItensPedido();
+            $itensPedido->user_id = $user->id;
+            $itensPedido->save();
+        }
+    
+        // Adiciona o produto ao carrinho
+        $produto = Produtos::findOrFail($produtoId);
+    
+        // Verifica se o produto já está no carrinho
+        $item = $itensPedido->produtos()->where('produto_id', $produto->id)->first();
+        
+        if ($item) {
+            // Atualiza a quantidade se o produto já estiver no carrinho
+            $item->pivot->qtd += $request->input('qtd', 1);
+            $item->pivot->save();
+        } else {
+            // Adiciona um novo item ao carrinho
+            $itensPedido->produtos()->attach($produto->id, ['qtd' => $request->input('qtd', 1)]);
+        }
+    
+        return redirect()->route('carrinho.index')->with('success', 'Produto adicionado ao carrinho!');
     }
-
-    $itemPedido->save();
-
-    // Redireciona para a página do carrinho
-    return redirect()->route('carrinho.index')->with('success', 'Produto adicionado ao carrinho!');
-}
+    
 }

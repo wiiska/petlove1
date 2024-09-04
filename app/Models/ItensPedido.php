@@ -11,10 +11,10 @@ class ItensPedido extends Model
 
     protected $fillable = ['user_id', 'produto_id', 'qtd'];
 
-    public function product()
-    {
-        return $this->belongsTo(Produtos::class, 'produto_id');
-    }
+    public function produtos()
+{
+    return $this->belongsToMany(Produtos::class)->withPivot('qtd');
+}
     
 
     public function user()

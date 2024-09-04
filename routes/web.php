@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\ItensPedidoController;
-use App\Http\Controllers\PessoaController;
-use App\Http\Controllers\PromocaoController;
+use App\Http\Controllers\PetController;
 use App\Models\ItensPedido;
 
 /*
@@ -14,10 +13,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 */
-
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 })->middleware(['auth', 'verified'])->name('/');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Rotas públicas (sem autenticação)
 Route::get('/produtos/report', [ProdutosController::class, 'report'])->name('produtos.report');
@@ -41,6 +43,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('produtos', ProdutosController::class); // Corrigido para 'produtos'
     Route::post('/produtos/search', [ProdutosController::class, 'search'])->name('produtos.search');
+        
+    Route::resource('pets', PetController::class);
+
     
 });
 

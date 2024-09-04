@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('itens_pedidos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('produto_id'); // Coluna para o ID do produto
-            $table->unsignedBigInteger('pedido_id'); // Coluna para o ID do pedido
-            $table->integer('qtd'); // Coluna para a quantidade
-
-            // Chaves estrangeiras
+            $table->unsignedBigInteger('produto_id');
+            $table->unsignedBigInteger('user_id');
+            $table->integer('qtd'); 
             $table->foreign('produto_id')->references('id')->on('produtos')->onDelete('cascade');
-            $table->foreign('pedido_id')->references('id')->on('pedidos')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });
@@ -32,7 +30,7 @@ return new class extends Migration
     {
         Schema::table('itens_pedidos', function (Blueprint $table) {
             $table->dropForeign(['produto_id']);
-            $table->dropForeign(['pedido_id']);
+            $table->dropForeign(['user_id']);
         });
 
         Schema::dropIfExists('itens_pedidos');
